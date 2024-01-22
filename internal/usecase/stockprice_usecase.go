@@ -13,9 +13,29 @@ func NewStockPriceUseCase(transactionRepository domain.TransactionRepository) do
 }
 
 func (st *stockPriceUseCase) AveragePurchasePrice(code string) (float64, error) {
-	return 0.0, nil
+	transactions, err := st.transactionRepository.Get(code)
+	if err != nil {
+		return 0.0, err
+	}
+
+	stock, err := domain.NewStock(code, transactions)
+	if err != nil {
+		return 0.0, err
+	}
+
+	return stock.AveragePurchasePrice()
 }
 
 func (st *stockPriceUseCase) AverageSellingPrice(code string) (float64, error) {
-	return 0.0, nil
+	transactions, err := st.transactionRepository.Get(code)
+	if err != nil {
+		return 0.0, err
+	}
+
+	stock, err := domain.NewStock(code, transactions)
+	if err != nil {
+		return 0.0, err
+	}
+
+	return stock.AverageSellingPrice()
 }

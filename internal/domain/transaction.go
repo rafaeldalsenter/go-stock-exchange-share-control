@@ -52,4 +52,5 @@ type NewTransactionUseCase interface {
 
 type TransactionRepository interface {
 	New(transaction *Transaction) error
+	Get(code string) ([]Transaction, error)
 }
