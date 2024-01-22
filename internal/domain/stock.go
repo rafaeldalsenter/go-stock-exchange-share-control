@@ -1,6 +1,9 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+	"math"
+)
 
 type Stock struct {
 	Code         string
@@ -23,15 +26,37 @@ func NewStock(code string, transactions []Transaction) (*Stock, error) {
 	}, nil
 }
 
+func (s *Stock) averagePrice(transactionType TransactionType) (float64, error) {
+	sumQuantity := 0.0
+	sumValue := 0.0
+
+	for _, transaction := range s.Transactions {
+
+		if transaction.Type != transactionType {
+			continue
+		}
+
+		sumValue += (transaction.Quantity * transaction.Value) + transaction.Tax
+		sumQuantity += transaction.Quantity
+	}
+
+	if sumValue == 0.0 {
+		return 0.0, errors.New("There are no valid " + string(transactionType) + " records")
+	}
+
+	ratio := math.Pow(10, float64(2))
+	return math.Round((sumValue/sumQuantity)*ratio) / ratio, nil
+}
+
 func (s *Stock) AveragePurchasePrice() (float64, error) {
-	return 0, nil
+	return s.averagePrice(Purchase)
 }
 
 func (s *Stock) AverageSellingPrice() (float64, error) {
-	return 0, nil
+	return s.averagePrice(Sale)
 }
 
-type StockAveragePriceUseCase interface {
+type StockPriceUseCase interface {
 	AveragePurchasePrice(code string) (float64, error)
 	AverageSellingPrice(code string) (float64, error)
 }

@@ -13,6 +13,7 @@ const (
 )
 
 type Transaction struct {
+	Code     string
 	Date     time.Time
 	Quantity float64
 	Value    float64
@@ -20,7 +21,11 @@ type Transaction struct {
 	Type     TransactionType
 }
 
-func NewTransaction(t TransactionType, date time.Time, quantity float64, value float64, tax float64) (*Transaction, error) {
+func NewTransaction(t TransactionType, code string, date time.Time, quantity float64, value float64, tax float64) (*Transaction, error) {
+
+	if code == "" {
+		return nil, errors.New("code is required")
+	}
 
 	if quantity <= 0 {
 		return nil, errors.New("quantity is invalid")
@@ -31,6 +36,7 @@ func NewTransaction(t TransactionType, date time.Time, quantity float64, value f
 	}
 
 	return &Transaction{
+		Code:     code,
 		Date:     date,
 		Quantity: quantity,
 		Value:    value,
@@ -42,4 +48,8 @@ func NewTransaction(t TransactionType, date time.Time, quantity float64, value f
 type NewTransactionUseCase interface {
 	NewSale(code string, date time.Time, quantity float64, value float64, tax float64) error
 	NewPurchase(code string, date time.Time, quantity float64, value float64, tax float64) error
+}
+
+type TransactionRepository interface {
+	New(transaction *Transaction) error
 }

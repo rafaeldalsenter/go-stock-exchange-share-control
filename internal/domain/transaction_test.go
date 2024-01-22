@@ -8,6 +8,7 @@ import (
 )
 
 var (
+	code     = "TestCode"
 	date     = time.Now()
 	quantity = 1.4
 	value    = 2.3
@@ -18,7 +19,7 @@ var (
 func TestNewTransactionWithValidValues(t *testing.T) {
 	assert := assert.New(t)
 
-	transaction, err := NewTransaction(tr, date, quantity, value, tax)
+	transaction, err := NewTransaction(tr, code, date, quantity, value, tax)
 
 	assert.NoError(err)
 	assert.Equal(date, transaction.Date)
@@ -32,7 +33,7 @@ func TestNewTransactionWithInvalidQuantity(t *testing.T) {
 	assert := assert.New(t)
 	invalidQuantity := float64(-1)
 
-	_, err := NewTransaction(tr, date, invalidQuantity, value, tax)
+	_, err := NewTransaction(tr, code, date, invalidQuantity, value, tax)
 
 	assert.Error(err)
 }
@@ -41,7 +42,7 @@ func TestNewTransactionWithInvalidValue(t *testing.T) {
 	assert := assert.New(t)
 	invalidValue := float64(-1)
 
-	_, err := NewTransaction(tr, date, quantity, invalidValue, tax)
+	_, err := NewTransaction(tr, code, date, quantity, invalidValue, tax)
 
 	assert.Error(err)
 }
