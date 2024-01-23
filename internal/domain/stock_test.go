@@ -49,17 +49,17 @@ func TestAveragePurchasePriceWithoutTax(t *testing.T) {
 	assert := assert.New(t)
 
 	var transactions = []Transaction{
-		Transaction{
+		{
 			Quantity: 5,
 			Value:    10,
 			Type:     Purchase,
 		},
-		Transaction{
+		{
 			Quantity: 3,
 			Value:    20,
 			Type:     Purchase,
 		},
-		Transaction{
+		{
 			Quantity: 1,
 			Value:    100,
 			Type:     Purchase,
@@ -79,13 +79,13 @@ func TestAveragePurchasePriceWithTax(t *testing.T) {
 	assert := assert.New(t)
 
 	var transactions = []Transaction{
-		Transaction{
+		{
 			Quantity: 100,
 			Value:    30,
 			Tax:      10,
 			Type:     Purchase,
 		},
-		Transaction{
+		{
 			Quantity: 50,
 			Value:    25,
 			Tax:      10,
