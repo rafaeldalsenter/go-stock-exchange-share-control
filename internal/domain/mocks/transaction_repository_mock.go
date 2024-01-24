@@ -10,17 +10,24 @@ type TransactionRepositoryMock struct {
 	mock.Mock
 }
 
-func (r *TransactionRepositoryMock) New(transaction *domain.Transaction) error {
+func (r *TransactionRepositoryMock) New(transaction *domain.Transaction) (string, error) {
 	args := r.Called(transaction)
 
-	var r0 error
-	if rf, ok := args.Get(0).(func(transaction *domain.Transaction) error); ok {
+	var r0 string
+	if rf, ok := args.Get(0).(func(transaction *domain.Transaction) string); ok {
 		r0 = rf(transaction)
 	} else {
-		r0 = args.Error(0)
+		r0 = args.Get(0).(string)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := args.Get(1).(func(transaction *domain.Transaction) error); ok {
+		r1 = rf(transaction)
+	} else {
+		r1 = args.Error(1)
+	}
+
+	return r0, r1
 }
 
 func (r *TransactionRepositoryMock) Get(code string) ([]domain.Transaction, error) {

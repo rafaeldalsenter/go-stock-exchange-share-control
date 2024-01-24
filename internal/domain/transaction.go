@@ -46,11 +46,11 @@ func NewTransaction(t TransactionType, code string, date time.Time, quantity flo
 }
 
 type NewTransactionUseCase interface {
-	NewSale(code string, date time.Time, quantity float64, value float64, tax float64) error
-	NewPurchase(code string, date time.Time, quantity float64, value float64, tax float64) error
+	NewSale(code string, date time.Time, quantity float64, value float64, tax float64) (string, error)
+	NewPurchase(code string, date time.Time, quantity float64, value float64, tax float64) (string, error)
 }
 
 type TransactionRepository interface {
-	New(transaction *Transaction) error
+	New(transaction *Transaction) (string, error)
 	Get(code string) ([]Transaction, error)
 }

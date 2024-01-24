@@ -21,9 +21,9 @@ func (c *controller) TransactionPost(w http.ResponseWriter, r *http.Request) (in
 	}
 
 	if transactionDto.Type == "purchase" {
-		err = c.NewTransactionUseCase.NewPurchase(code, transactionDto.Date, transactionDto.Quantity, transactionDto.Value, transactionDto.Tax)
+		_, err = c.NewTransactionUseCase.NewPurchase(code, transactionDto.Date, transactionDto.Quantity, transactionDto.Value, transactionDto.Tax)
 	} else if transactionDto.Type == "sale" {
-		err = c.NewTransactionUseCase.NewSale(code, transactionDto.Date, transactionDto.Quantity, transactionDto.Value, transactionDto.Tax)
+		_, err = c.NewTransactionUseCase.NewSale(code, transactionDto.Date, transactionDto.Quantity, transactionDto.Value, transactionDto.Tax)
 	} else {
 		err = errors.New("Transaction type not identified")
 	}

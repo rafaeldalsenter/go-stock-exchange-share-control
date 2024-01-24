@@ -56,6 +56,12 @@ func (s *Stock) AverageSellingPrice() (float64, error) {
 	return s.averagePrice(Sale)
 }
 
+func (s *Stock) Profit() (float64, error) {
+	// TODO calcular lucro até agora
+	// rodar todas as vendas e ir calculando o lucro de cada uma (so considerando o estado até entao das compras)
+	return 0, nil
+}
+
 type StockPriceUseCase interface {
 	AveragePurchasePrice(code string) (float64, error)
 	AverageSellingPrice(code string) (float64, error)

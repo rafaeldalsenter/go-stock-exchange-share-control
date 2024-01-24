@@ -15,21 +15,21 @@ func NewTransactionUseCase(transactionRepository domain.TransactionRepository) d
 	}
 }
 
-func (tr *transactionUseCase) NewSale(code string, date time.Time, quantity float64, value float64, tax float64) error {
+func (tr *transactionUseCase) NewSale(code string, date time.Time, quantity float64, value float64, tax float64) (string, error) {
 
 	transaction, err := domain.NewTransaction(domain.Sale, code, date, quantity, value, tax)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	return tr.transactionRepository.New(transaction)
 }
 
-func (tr *transactionUseCase) NewPurchase(code string, date time.Time, quantity float64, value float64, tax float64) error {
+func (tr *transactionUseCase) NewPurchase(code string, date time.Time, quantity float64, value float64, tax float64) (string, error) {
 
 	transaction, err := domain.NewTransaction(domain.Purchase, code, date, quantity, value, tax)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	return tr.transactionRepository.New(transaction)
