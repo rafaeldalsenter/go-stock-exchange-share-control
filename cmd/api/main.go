@@ -8,15 +8,27 @@ import (
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/spf13/viper"
 )
+
+func init() {
+	viper.SetConfigFile("config.json")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
 
-	// build
-	tr := mongo.NewTransactionRepositoryMongo("")
+	mongoConnectionString := viper.GetString("mongo.connectionString")
+	mongoDatabase := viper.GetString("mongo.database")
+	mongoCollection := viper.GetString("mongo.collection")
+
+	tr := mongo.NewTransactionRepositoryMongo(mongoConnectionString, mongoDatabase, mongoCollection)
 	s := usecase.NewStockPriceUseCase(tr)
 	t := usecase.NewTransactionUseCase(tr)
 	c := controllers.NewController(s, t)
@@ -25,5 +37,5 @@ func main() {
 	r.Get("/stock/{code}/average-purchase", controllers.ControllerBase(c.AveragePurchaseGet))
 	r.Get("/stock/{code}/average-selling", controllers.ControllerBase(c.AverageSellingGet))
 
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(viper.GetString("server.address"), r)
 }
