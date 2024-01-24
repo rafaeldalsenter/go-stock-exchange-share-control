@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"go-stock-exchange-shares-control/infra/mongo"

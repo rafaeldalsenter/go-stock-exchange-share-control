@@ -28,11 +28,10 @@ func ControllerBase(controllerFunc ControllerFunc) http.HandlerFunc {
 		render.Status(r, statusCode)
 
 		if err != nil {
+			render.JSON(w, r, map[string]string{"error": err.Error()})
 			return
 		}
 
-		if result != nil {
-			render.JSON(w, r, result)
-		}
+		render.JSON(w, r, result)
 	})
 }

@@ -5,7 +5,6 @@ import (
 	"go-stock-exchange-shares-control/internal/domain"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -39,12 +38,9 @@ func (tr *transactionRepository) Get(code string) ([]domain.Transaction, error) 
 	collection := tr.database.Collection(tr.collection)
 	c := context.TODO()
 
-	idHex, err := primitive.ObjectIDFromHex(code)
-	if err != nil {
-		return nil, err
-	}
+	filter := bson.D{{Key: "code", Value: code}}
 
-	cursor, err := collection.Find(c, bson.M{"code": idHex})
+	cursor, err := collection.Find(c, filter)
 	if err != nil {
 		return nil, err
 	}

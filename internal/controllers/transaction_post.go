@@ -5,7 +5,7 @@ import (
 	"go-stock-exchange-shares-control/internal/dtos"
 	"net/http"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
 
@@ -14,9 +14,11 @@ func (c *controller) TransactionPost(w http.ResponseWriter, r *http.Request) (in
 	code := chi.URLParam(r, "code")
 
 	var transactionDto dtos.TransactionDto
-	render.DecodeJSON(r.Body, &transactionDto)
+	err := render.DecodeJSON(r.Body, &transactionDto)
 
-	var err error
+	if err != nil {
+		return nil, 400, err
+	}
 
 	if transactionDto.Type == "purchase" {
 		err = c.NewTransactionUseCase.NewPurchase(code, transactionDto.Date, transactionDto.Quantity, transactionDto.Value, transactionDto.Tax)
