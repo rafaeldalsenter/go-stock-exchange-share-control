@@ -42,12 +42,12 @@ func TestAveragePurchasePriceWithSuccess(t *testing.T) {
 	assert := assert.New(t)
 
 	var transactions = []domain.Transaction{
-		domain.Transaction{
+		{
 			Quantity: 2,
 			Value:    100,
 			Type:     domain.Purchase,
 		},
-		domain.Transaction{
+		{
 			Quantity: 5,
 			Value:    12,
 			Type:     domain.Purchase,
