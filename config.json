@@ -6,6 +6,9 @@
         "connectionString": "mongodb://user:pass@localhost:27017/",
         "database": "local",
         "collection": "transactions"
+    },
+    "file":{
+      "name": "../../sample.csv"
     }
 }
   
