@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"go-stock-exchange-shares-control/internal/domain"
 	"go-stock-exchange-shares-control/internal/domain/mocks"
@@ -12,16 +13,17 @@ import (
 
 var (
 	stockUseCase = stockPriceUseCase{}
+	ctx          = context.TODO()
 )
 
 func TestAveragePurchasePriceWithRepositoryError(t *testing.T) {
 	assert := assert.New(t)
 
 	repositoryMock := new(mocks.TransactionRepositoryMock)
-	repositoryMock.On("Get", mock.Anything).Return([]domain.Transaction{}, errors.New("Unexpected"))
+	repositoryMock.On("Get", mock.Anything, mock.Anything).Return([]domain.Transaction{}, errors.New("Unexpected"))
 	stockUseCase.transactionRepository = repositoryMock
 
-	_, err := stockUseCase.AveragePurchasePrice(code)
+	_, err := stockUseCase.AveragePurchasePrice(ctx, code)
 
 	assert.Error(err)
 }
@@ -30,10 +32,10 @@ func TestAveragePurchasePriceWithDomainError(t *testing.T) {
 	assert := assert.New(t)
 
 	repositoryMock := new(mocks.TransactionRepositoryMock)
-	repositoryMock.On("Get", mock.Anything).Return([]domain.Transaction{}, nil)
+	repositoryMock.On("Get", mock.Anything, mock.Anything).Return([]domain.Transaction{}, nil)
 	stockUseCase.transactionRepository = repositoryMock
 
-	_, err := stockUseCase.AveragePurchasePrice(code)
+	_, err := stockUseCase.AveragePurchasePrice(ctx, code)
 
 	assert.Error(err)
 }
@@ -55,10 +57,10 @@ func TestAveragePurchasePriceWithSuccess(t *testing.T) {
 	}
 
 	repositoryMock := new(mocks.TransactionRepositoryMock)
-	repositoryMock.On("Get", mock.Anything).Return(transactions, nil)
+	repositoryMock.On("Get", mock.Anything, mock.Anything).Return(transactions, nil)
 	stockUseCase.transactionRepository = repositoryMock
 
-	average, err := stockUseCase.AveragePurchasePrice(code)
+	average, err := stockUseCase.AveragePurchasePrice(ctx, code)
 
 	assert.NoError(err)
 	assert.Equal(37.14, average)

@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"go-stock-exchange-shares-control/internal/domain"
 	"time"
 )
@@ -15,22 +16,22 @@ func NewTransactionUseCase(transactionRepository domain.TransactionRepository) d
 	}
 }
 
-func (tr *transactionUseCase) NewSale(code string, date time.Time, quantity float64, value float64, tax float64) (string, error) {
+func (tr *transactionUseCase) NewSale(c context.Context, code string, date time.Time, quantity float64, value float64, tax float64) (string, error) {
 
 	transaction, err := domain.NewTransaction(domain.Sale, code, date, quantity, value, tax)
 	if err != nil {
 		return "", err
 	}
 
-	return tr.transactionRepository.New(transaction)
+	return tr.transactionRepository.New(c, transaction)
 }
 
-func (tr *transactionUseCase) NewPurchase(code string, date time.Time, quantity float64, value float64, tax float64) (string, error) {
+func (tr *transactionUseCase) NewPurchase(c context.Context, code string, date time.Time, quantity float64, value float64, tax float64) (string, error) {
 
 	transaction, err := domain.NewTransaction(domain.Purchase, code, date, quantity, value, tax)
 	if err != nil {
 		return "", err
 	}
 
-	return tr.transactionRepository.New(transaction)
+	return tr.transactionRepository.New(c, transaction)
 }

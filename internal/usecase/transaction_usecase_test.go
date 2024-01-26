@@ -23,10 +23,10 @@ func TestNewPurchaseWithDomainError(t *testing.T) {
 	assert := assert.New(t)
 
 	repositoryMock := new(mocks.TransactionRepositoryMock)
-	repositoryMock.On("New", mock.Anything).Return("", nil)
+	repositoryMock.On("New", mock.Anything, mock.Anything).Return("", nil)
 	useCase.transactionRepository = repositoryMock
 
-	_, err := useCase.NewPurchase("", date, quantity, value, tax)
+	_, err := useCase.NewPurchase(ctx, "", date, quantity, value, tax)
 
 	assert.Error(err)
 }
@@ -35,10 +35,10 @@ func TestNewPurchaseWithRepositoryError(t *testing.T) {
 	assert := assert.New(t)
 
 	repositoryMock := new(mocks.TransactionRepositoryMock)
-	repositoryMock.On("New", mock.Anything).Return("", errors.New("Unexpected"))
+	repositoryMock.On("New", mock.Anything, mock.Anything).Return("", errors.New("Unexpected"))
 	useCase.transactionRepository = repositoryMock
 
-	_, err := useCase.NewPurchase(code, date, quantity, value, tax)
+	_, err := useCase.NewPurchase(ctx, code, date, quantity, value, tax)
 
 	assert.Error(err)
 }
@@ -47,10 +47,10 @@ func TestNewPurchaseWithSuccess(t *testing.T) {
 	assert := assert.New(t)
 
 	repositoryMock := new(mocks.TransactionRepositoryMock)
-	repositoryMock.On("New", mock.Anything).Return("", nil)
+	repositoryMock.On("New", mock.Anything, mock.Anything).Return("", nil)
 	useCase.transactionRepository = repositoryMock
 
-	_, err := useCase.NewPurchase(code, date, quantity, value, tax)
+	_, err := useCase.NewPurchase(ctx, code, date, quantity, value, tax)
 
 	assert.NoError(err)
 }
@@ -59,10 +59,10 @@ func TestNewSaleWithDomainError(t *testing.T) {
 	assert := assert.New(t)
 
 	repositoryMock := new(mocks.TransactionRepositoryMock)
-	repositoryMock.On("New", mock.Anything).Return("", nil)
+	repositoryMock.On("New", mock.Anything, mock.Anything).Return("", nil)
 	useCase.transactionRepository = repositoryMock
 
-	_, err := useCase.NewSale("", date, quantity, value, tax)
+	_, err := useCase.NewSale(ctx, "", date, quantity, value, tax)
 
 	assert.Error(err)
 }
@@ -71,10 +71,10 @@ func TestNewSaleWithRepositoryError(t *testing.T) {
 	assert := assert.New(t)
 
 	repositoryMock := new(mocks.TransactionRepositoryMock)
-	repositoryMock.On("New", mock.Anything).Return("", errors.New("Unexpected"))
+	repositoryMock.On("New", mock.Anything, mock.Anything).Return("", errors.New("Unexpected"))
 	useCase.transactionRepository = repositoryMock
 
-	_, err := useCase.NewSale(code, date, quantity, value, tax)
+	_, err := useCase.NewSale(ctx, code, date, quantity, value, tax)
 
 	assert.Error(err)
 }
@@ -83,10 +83,10 @@ func TestNewSaleWithSuccess(t *testing.T) {
 	assert := assert.New(t)
 
 	repositoryMock := new(mocks.TransactionRepositoryMock)
-	repositoryMock.On("New", mock.Anything).Return("", nil)
+	repositoryMock.On("New", mock.Anything, mock.Anything).Return("", nil)
 	useCase.transactionRepository = repositoryMock
 
-	_, err := useCase.NewSale(code, date, quantity, value, tax)
+	_, err := useCase.NewSale(ctx, code, date, quantity, value, tax)
 
 	assert.NoError(err)
 }

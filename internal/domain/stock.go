@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"errors"
 	"math"
 )
@@ -63,6 +64,6 @@ func (s *Stock) Profit() (float64, error) {
 }
 
 type StockPriceUseCase interface {
-	AveragePurchasePrice(code string) (float64, error)
-	AverageSellingPrice(code string) (float64, error)
+	AveragePurchasePrice(c context.Context, code string) (float64, error)
+	AverageSellingPrice(c context.Context, code string) (float64, error)
 }

@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"go-stock-exchange-shares-control/internal/domain"
 )
@@ -15,8 +16,8 @@ func NewStockPriceUseCase(transactionRepository domain.TransactionRepository) do
 	}
 }
 
-func (st *stockPriceUseCase) AveragePurchasePrice(code string) (float64, error) {
-	transactions, err := st.transactionRepository.Get(code)
+func (st *stockPriceUseCase) AveragePurchasePrice(c context.Context, code string) (float64, error) {
+	transactions, err := st.transactionRepository.Get(c, code)
 	if err != nil {
 		return 0.0, errors.New("Repository error")
 	}
@@ -29,8 +30,8 @@ func (st *stockPriceUseCase) AveragePurchasePrice(code string) (float64, error) 
 	return stock.AveragePurchasePrice()
 }
 
-func (st *stockPriceUseCase) AverageSellingPrice(code string) (float64, error) {
-	transactions, err := st.transactionRepository.Get(code)
+func (st *stockPriceUseCase) AverageSellingPrice(c context.Context, code string) (float64, error) {
+	transactions, err := st.transactionRepository.Get(c, code)
 	if err != nil {
 		return 0.0, errors.New("Repository error")
 	}

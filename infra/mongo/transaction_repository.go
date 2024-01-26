@@ -26,18 +26,16 @@ func NewTransactionRepositoryMongo(connectionString string, databaseName string,
 	}
 }
 
-func (tr *transactionRepository) New(transaction *domain.Transaction) (string, error) {
+func (tr *transactionRepository) New(c context.Context, transaction *domain.Transaction) (string, error) {
 	collection := tr.database.Collection(tr.collection)
-	c := context.TODO()
 
 	result, err := collection.InsertOne(c, transaction)
 
 	return result.InsertedID.(primitive.ObjectID).String(), err
 }
 
-func (tr *transactionRepository) Get(code string) ([]domain.Transaction, error) {
+func (tr *transactionRepository) Get(c context.Context, code string) ([]domain.Transaction, error) {
 	collection := tr.database.Collection(tr.collection)
-	c := context.TODO()
 
 	filter := bson.D{{Key: "code", Value: code}}
 

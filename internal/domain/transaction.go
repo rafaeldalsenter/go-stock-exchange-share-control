@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"errors"
 	"time"
 )
@@ -46,11 +47,11 @@ func NewTransaction(t TransactionType, code string, date time.Time, quantity flo
 }
 
 type NewTransactionUseCase interface {
-	NewSale(code string, date time.Time, quantity float64, value float64, tax float64) (string, error)
-	NewPurchase(code string, date time.Time, quantity float64, value float64, tax float64) (string, error)
+	NewSale(c context.Context, code string, date time.Time, quantity float64, value float64, tax float64) (string, error)
+	NewPurchase(c context.Context, code string, date time.Time, quantity float64, value float64, tax float64) (string, error)
 }
 
 type TransactionRepository interface {
-	New(transaction *Transaction) (string, error)
-	Get(code string) ([]Transaction, error)
+	New(c context.Context, transaction *Transaction) (string, error)
+	Get(c context.Context, code string) ([]Transaction, error)
 }

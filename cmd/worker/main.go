@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/csv"
 	"go-stock-exchange-shares-control/infra/mongo"
 	"go-stock-exchange-shares-control/internal/usecase"
@@ -30,6 +31,8 @@ func main() {
 	t := usecase.NewTransactionUseCase(tr)
 
 	filename := viper.GetString("file.name")
+
+	ctx := context.Background()
 
 	log.Printf("Starting %s file", filename)
 
@@ -68,7 +71,7 @@ func main() {
 			}
 
 			if transaction.Type == "purchase" {
-				_, err := t.NewPurchase(line[0], transaction.Date, transaction.Quantity, transaction.Value, transaction.Tax)
+				_, err := t.NewPurchase(ctx, line[0], transaction.Date, transaction.Quantity, transaction.Value, transaction.Tax)
 				if err != nil {
 					log.Printf(err.Error())
 					return
@@ -76,7 +79,7 @@ func main() {
 				log.Printf("Transaction %s/%s imported", line[0], line[1])
 
 			} else if transaction.Type == "sale" {
-				_, err := t.NewPurchase(line[0], transaction.Date, transaction.Quantity, transaction.Value, transaction.Tax)
+				_, err := t.NewPurchase(ctx, line[0], transaction.Date, transaction.Quantity, transaction.Value, transaction.Tax)
 				if err != nil {
 					log.Printf(err.Error())
 					return
