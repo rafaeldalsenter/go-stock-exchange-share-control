@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/spf13/viper"
 )
@@ -32,6 +33,8 @@ func main() {
 
 	log.Printf("Starting %s file", filename)
 
+	var wg sync.WaitGroup
+
 	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)
@@ -43,7 +46,6 @@ func main() {
 	for {
 
 		// TODO tratar erros ?? para nao inserir duplicado / idepotencia
-		// TODO adicionar assincronismo no processamento
 		line, err := csvReader.Read()
 		if err == io.EOF {
 			break
@@ -54,29 +56,36 @@ func main() {
 			continue
 		}
 
-		transaction, err := utils.ConverterTransactionValues(line[1], line[2], line[3], line[4], line[5])
-		if err != nil {
-			log.Printf(err.Error())
-			continue
-		}
+		wg.Add(1)
 
-		if transaction.Type == "purchase" {
-			_, err := t.NewPurchase(line[0], transaction.Date, transaction.Quantity, transaction.Value, transaction.Tax)
+		go func() {
+			defer wg.Done()
+
+			transaction, err := utils.ConverterTransactionValues(line[1], line[2], line[3], line[4], line[5])
 			if err != nil {
 				log.Printf(err.Error())
-				continue
+				return
 			}
-			log.Printf("Transaction %s/%s imported", line[0], line[1])
 
-		} else if transaction.Type == "sale" {
-			_, err := t.NewPurchase(line[0], transaction.Date, transaction.Quantity, transaction.Value, transaction.Tax)
-			if err != nil {
-				log.Printf(err.Error())
-				continue
+			if transaction.Type == "purchase" {
+				_, err := t.NewPurchase(line[0], transaction.Date, transaction.Quantity, transaction.Value, transaction.Tax)
+				if err != nil {
+					log.Printf(err.Error())
+					return
+				}
+				log.Printf("Transaction %s/%s imported", line[0], line[1])
+
+			} else if transaction.Type == "sale" {
+				_, err := t.NewPurchase(line[0], transaction.Date, transaction.Quantity, transaction.Value, transaction.Tax)
+				if err != nil {
+					log.Printf(err.Error())
+					return
+				}
+				log.Printf("Transaction %s/%s imported", line[0], line[1])
+			} else {
+				log.Printf("Not identified transaction %s type", transaction.Type)
 			}
-			log.Printf("Transaction %s/%s imported", line[0], line[1])
-		} else {
-			log.Printf("Not identified transaction %s type", transaction.Type)
-		}
+		}()
 	}
+	wg.Wait()
 }
