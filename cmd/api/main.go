@@ -35,7 +35,6 @@ func main() {
 
 	r.Post("/stock/{code}/transaction", controllers.ControllerBase(c.TransactionPost))
 	r.Get("/stock/{code}/average-purchase", controllers.ControllerBase(c.AveragePurchaseGet))
-	r.Get("/stock/{code}/average-selling", controllers.ControllerBase(c.AverageSellingGet))
 
 	http.ListenAndServe(viper.GetString("server.address"), r)
 }

@@ -23,9 +23,3 @@ Calculate the average purchase price
 ```
 curl --location 'http://localhost:3000/stock/CODE/average-purchase'
 ```
-
-Calculate the average selling price
-
-```
-curl --location 'http://localhost:3000/stock/CODE/average-selling'
-```

@@ -2,6 +2,7 @@ package domain
 
 import (
 	"testing"
+	"time"
 
 	"github.com/bxcodec/faker"
 	"github.com/stretchr/testify/assert"
@@ -121,21 +122,167 @@ func TestAveragePurchasePriceWithoutRecords(t *testing.T) {
 	assert.Error(err)
 }
 
-func TestAverageSellingPriceWithoutRecords(t *testing.T) {
+func TestSalesResultNegativeWithoutTax(t *testing.T) {
 	assert := assert.New(t)
 
-	var transactions []Transaction
-	err := faker.FakeData(&transactions)
-	assert.NoError(err)
-
-	for i := 0; i < len(transactions); i++ {
-		transactions[i].Type = Purchase
+	var transactions = []Transaction{
+		{
+			Quantity: 10,
+			Value:    11,
+			Type:     Sale,
+			Date:     getDateByString("2024-01-18T10:20:50.52Z"),
+		},
+		{
+			Quantity: 10,
+			Value:    10.25,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-16T07:20:50.52Z"),
+		},
+		{
+			Quantity: 12,
+			Value:    11.25,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-17T07:20:50.52Z"),
+		},
+		{
+			Quantity: 13,
+			Value:    12.75,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-18T07:20:50.52Z"),
+		},
 	}
 
 	stock, err := NewStock(code, transactions)
 	assert.NoError(err)
 
-	_, err = stock.AverageSellingPrice()
+	salesResult, err := stock.SalesResult()
 
-	assert.Error(err)
+	assert.NoError(err)
+	assert.Equal(-5.20, salesResult[0].Result)
+}
+
+func TestSalesResultPositiveWithoutTax(t *testing.T) {
+	assert := assert.New(t)
+
+	var transactions = []Transaction{
+		{
+			Quantity: 12,
+			Value:    25,
+			Type:     Sale,
+			Date:     getDateByString("2024-01-18T10:20:50.52Z"),
+		},
+		{
+			Quantity: 10,
+			Value:    10.25,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-16T07:20:50.52Z"),
+		},
+		{
+			Quantity: 12,
+			Value:    11.25,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-17T07:20:50.52Z"),
+		},
+	}
+
+	stock, err := NewStock(code, transactions)
+	assert.NoError(err)
+
+	salesResult, err := stock.SalesResult()
+
+	assert.NoError(err)
+	assert.Equal(170.4, salesResult[0].Result)
+}
+
+func TestSalesResultWithTax(t *testing.T) {
+	assert := assert.New(t)
+
+	var transactions = []Transaction{
+		{
+			Quantity: 20,
+			Value:    10,
+			Tax:      0.5,
+			Type:     Sale,
+			Date:     getDateByString("2024-01-18T10:20:50.52Z"),
+		},
+		{
+			Quantity: 10,
+			Value:    11.8,
+			Tax:      0.5,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-16T07:20:50.52Z"),
+		},
+		{
+			Quantity: 12,
+			Value:    9.8,
+			Tax:      0.5,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-17T07:20:50.52Z"),
+		},
+		{
+			Quantity: 9,
+			Value:    7.0,
+			Tax:      0.5,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-17T08:20:50.52Z"),
+		},
+	}
+
+	stock, err := NewStock(code, transactions)
+	assert.NoError(err)
+
+	salesResult, err := stock.SalesResult()
+
+	assert.NoError(err)
+	assert.Equal(5.9, salesResult[0].Result)
+}
+
+func TestSalesResultWithMultiples(t *testing.T) {
+	assert := assert.New(t)
+
+	var transactions = []Transaction{
+		{
+			Quantity: 12,
+			Value:    25,
+			Type:     Sale,
+			Date:     getDateByString("2024-01-18T10:20:50.52Z"),
+		},
+		{
+			Quantity: 10,
+			Value:    5,
+			Type:     Sale,
+			Date:     getDateByString("2024-01-20T10:20:50.52Z"),
+		},
+		{
+			Quantity: 10,
+			Value:    10.25,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-16T07:20:50.52Z"),
+		},
+		{
+			Quantity: 12,
+			Value:    11.25,
+			Type:     Purchase,
+			Date:     getDateByString("2024-01-17T07:20:50.52Z"),
+		},
+	}
+
+	stock, err := NewStock(code, transactions)
+	assert.NoError(err)
+
+	salesResult, err := stock.SalesResult()
+
+	assert.NoError(err)
+	assert.Equal(170.4, salesResult[0].Result)
+	assert.Equal(-58.0, salesResult[1].Result)
+
+}
+
+func getDateByString(value string) time.Time {
+	tim, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		panic(err)
+	}
+
+	return tim
 }

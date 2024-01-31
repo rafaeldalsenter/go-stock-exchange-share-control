@@ -3,7 +3,9 @@ package domain
 import (
 	"context"
 	"errors"
+	"go-stock-exchange-shares-control/internal/dtos"
 	"math"
+	"slices"
 )
 
 type Stock struct {
@@ -27,13 +29,13 @@ func NewStock(code string, transactions []Transaction) (*Stock, error) {
 	}, nil
 }
 
-func (s *Stock) averagePrice(transactionType TransactionType) (float64, error) {
+func (s *Stock) AveragePurchasePrice() (float64, error) {
 	sumQuantity := 0.0
 	sumValue := 0.0
 
 	for _, transaction := range s.Transactions {
 
-		if transaction.Type != transactionType {
+		if transaction.Type != Purchase {
 			continue
 		}
 
@@ -42,28 +44,49 @@ func (s *Stock) averagePrice(transactionType TransactionType) (float64, error) {
 	}
 
 	if sumValue == 0.0 {
-		return 0.0, errors.New("There are no valid " + string(transactionType) + " records")
+		return 0.0, errors.New("There are no valid purchase records")
 	}
 
 	ratio := math.Pow(10, float64(2))
 	return math.Round((sumValue/sumQuantity)*ratio) / ratio, nil
 }
 
-func (s *Stock) AveragePurchasePrice() (float64, error) {
-	return s.averagePrice(Purchase)
-}
+func (s *Stock) SalesResult() ([]dtos.SalesDto, error) {
 
-func (s *Stock) AverageSellingPrice() (float64, error) {
-	return s.averagePrice(Sale)
-}
+	sumPurchaseQuantity := 0.0
+	sumPurchaseValue := 0.0
+	ratio := math.Pow(10, float64(2))
+	salesResult := make([]dtos.SalesDto, 0)
 
-func (s *Stock) Profit() (float64, error) {
-	// TODO calcular lucro até agora
-	// rodar todas as vendas e ir calculando o lucro de cada uma (so considerando o estado até entao das compras)
-	return 0, nil
+	transactionsOrdered := s.Transactions
+	slices.SortFunc(transactionsOrdered, func(tr1, tr2 Transaction) int {
+		return tr1.Date.Compare(tr2.Date)
+	})
+
+	for _, transaction := range transactionsOrdered {
+
+		if transaction.Type == Purchase {
+			sumPurchaseValue += (transaction.Quantity * transaction.Value) + transaction.Tax
+			sumPurchaseQuantity += transaction.Quantity
+			continue
+		}
+
+		if transaction.Type == Sale {
+			if sumPurchaseValue == 0.0 {
+				return []dtos.SalesDto{}, errors.New("Inconsistent records")
+			}
+
+			averagePurchase := math.Round((sumPurchaseValue/sumPurchaseQuantity)*ratio) / ratio
+			result := math.Round((((transaction.Quantity*transaction.Value)-transaction.Tax)-(transaction.Quantity*averagePurchase))*ratio) / ratio
+			salesResult = append(salesResult, dtos.SalesDto{Date: transaction.Date, Result: result})
+			continue
+		}
+
+	}
+
+	return salesResult, nil
 }
 
 type StockPriceUseCase interface {
 	AveragePurchasePrice(c context.Context, code string) (float64, error)
-	AverageSellingPrice(c context.Context, code string) (float64, error)
 }
